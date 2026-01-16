@@ -9,7 +9,7 @@ Summary:        The Missing Package Manager for macOS (or Linux)
 
 License:        Apache-2.0 AND BSD-2-Clause
 URL:            https://github.com/HastD/%{name}
-Source0:        https://github.com/HastD/%{name}/tarball/main
+Source0:        %{name}-@@VERSION@@.tar.gz
 
 BuildRequires:  podman
 BuildRequires:  systemd-rpm-macros

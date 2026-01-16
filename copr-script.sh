@@ -10,3 +10,5 @@ latest_tag=$(curl -fLsS --retry 3 'https://api.github.com/repos/Homebrew/brew/re
 
 curl -fLsS --retry 3 'https://raw.githubusercontent.com/HastD/homebrew/refs/heads/main/homebrew-template.spec' \
     | sed --sandbox -e "s/@@VERSION@@/${latest_tag}/g" > ./homebrew.spec
+
+curl -fLsS --retry 3 -o "homebrew-${latest_tag}.tar.gz" 'https://github.com/HastD/homebrew/tarball/main'
