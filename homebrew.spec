@@ -2,17 +2,16 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-%define build_date %(date -u '+%%Y%%m%%d')
-
 Name:           homebrew
-Version:        0.1.0
-Release:        %{build_date}_1
+Version:        @@VERSION@@
+Release:        1
 Summary:        The Missing Package Manager for macOS (or Linux)
 
 License:        Apache-2.0 AND BSD-2-Clause
 URL:            https://github.com/HastD/%{name}
-Source0:        https://github.com/HastD/%{name}/archive/refs/tags/v%{version}.tar.gz
+Source0:        https://github.com/HastD/%{name}/tarball/main
 
+BuildRequires:  podman
 BuildRequires:  systemd-rpm-macros
 Requires:       gcc
 Requires:       zstd
@@ -25,12 +24,18 @@ Homebrew installs the stuff you need that Apple (or your Linux system) didn't.
 %autosetup
 
 %build
-env -i PATH=/usr/bin:/bin:/usr/sbin:/sbin HOME=/home/linuxbrew NONINTERACTIVE=1 /bin/bash ./install.sh
+mkdir ./%{name}-build
+# Install inside podman container to avoid needing root to install to /home/linuxbrew
+podman run --rm \
+    -v ./%{name}-build:/home/linuxbrew:Z \
+    -v ./install.sh:/install.sh:Z \
+    registry.fedoraproject.org/fedora:latest \
+    bash -c 'dnf install -y git && env -i PATH=/usr/bin:/bin:/usr/sbin:/sbin HOME=/home/linuxbrew NONINTERACTIVE=1 /bin/bash /install.sh'
 
 %install
 # main brew installation
 mkdir -m 755 -p %{buildroot}%{_datadir}/%{name}
-cp -a /home/linuxbrew/.linuxbrew %{buildroot}%{_datadir}/%{name}
+cp -dpR ./%{name}-build/.linuxbrew %{buildroot}%{_datadir}/%{name}
 
 # systemd units for automatic brew setup and updates
 cp -a systemd/brew-*.service systemd/brew-*.timer %{buildroot}%{_unitdir}
@@ -81,5 +86,5 @@ cp -a tmpfiles.d/homebrew.conf %{buildroot}%{_tmpfilesdir}
 %ghost %config(noreplace) %{_sysconfdir}/.linuxbrew
 
 %changelog
-* Thu Jan 15 2026 Daniel Hast <hast.daniel@protonmail.com> v0.1.0
+* Fri Jan 16 2026 Daniel Hast <hast.daniel@protonmail.com>
   - Initial RPM release
