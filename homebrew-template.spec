@@ -21,7 +21,7 @@ Requires:       zstd
 Homebrew installs the stuff you need that Apple (or your Linux system) didn't.
 
 %prep
-%autosetup
+%setup -C
 
 %build
 mkdir ./%{name}-build
