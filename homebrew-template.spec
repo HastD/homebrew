@@ -10,7 +10,7 @@ Summary:        The Missing Package Manager for macOS (or Linux)
 License:        Apache-2.0 AND BSD-2-Clause
 URL:            https://github.com/HastD/%{name}
 Source0:        %{name}-@@VERSION@@.tar.gz
-Source1:        homebrew-install.sh
+Source1:        %{name}-install.sh
 
 BuildRequires:  curl >= 7.41.0
 BuildRequires:  git >= 2.7.0
@@ -26,12 +26,12 @@ Homebrew installs the stuff you need that Apple (or your Linux system) didn't.
 
 %prep
 %setup -C
-mv %{_sourcedir}/homebrew-install.sh .
-patch -p0 < homebrew-install.patch
+mv %{_sourcedir}/%{name}-install.sh .
+patch -p0 < %{name}-install.patch
 
 %build
 mkdir .linuxbrew
-env -i HOME=/home/linuxbrew PATH=/usr/bin:/bin:/usr/sbin:/sbin NONINTERACTIVE=1 /bin/bash ./install.sh
+env -i HOME=/home/linuxbrew PATH=/usr/bin:/bin:/usr/sbin:/sbin NONINTERACTIVE=1 /bin/bash ./%{name}-install.sh
 
 %install
 # main brew installation
