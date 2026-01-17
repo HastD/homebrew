@@ -7,12 +7,17 @@
 This repository packages [Homebrew](https://brew.sh/) for Linux as an RPM
 package.
 
-The RPM package sets up a Homebrew installation (as created by the official
-install script) in `/usr/share/homebrew`. If Homebrew has not already been set
-up on the user's system, a systemd service then copies this installation to
-`/home/linuxbrew` and transfers ownership of it to UID 1000. The package also
-sets up systemd services to automatically update Homebrew, as well as shell
-completions for the bash and fish shells.
+The RPM package sets up a Homebrew installation in `/usr/share/homebrew`. To
+minimize deviation from the official install script, this installation is
+produced at build-time using a version of the install script that's been patched
+to use a different installation prefix and to omit steps that should wait until
+after installation (such as setting up the Homebrew cache and running
+`brew update`).
+
+If Homebrew has not already been set up on the user's system, a systemd service
+then copies this installation to `/home/linuxbrew` and transfers ownership of it
+to UID 1000. The package also sets up systemd services to automatically update
+Homebrew, as well as shell completions for the bash and fish shells.
 
 ## Credit
 
