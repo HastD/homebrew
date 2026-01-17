@@ -11,7 +11,6 @@ License:        Apache-2.0 AND BSD-2-Clause
 URL:            https://github.com/HastD/%{name}
 Source0:        %{name}-@@VERSION@@.tar.gz
 Source1:        homebrew-install.sh
-Patch0:         homebrew-install.patch
 
 BuildRequires:  curl >= 7.41.0
 BuildRequires:  git >= 2.7.0
@@ -28,7 +27,7 @@ Homebrew installs the stuff you need that Apple (or your Linux system) didn't.
 %prep
 %setup -C
 mv %{_sourcedir}/homebrew-install.sh .
-%patch 0
+patch -p0 < homebrew-install.patch
 
 %build
 mkdir .linuxbrew
