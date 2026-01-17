@@ -43,3 +43,12 @@ SPDX-License-Identifier: Apache-2.0
  if should_install_command_line_tools && version_ge "${macos_version}" "10.13"
  then
    ohai "Searching online for the Command Line Tools"
+@@ -1029,8 +1007,6 @@
+     PATH_WARN=1
+   fi
+ 
+-  execute "${HOMEBREW_PREFIX}/bin/brew" "update" "--force" "--quiet"
+-
+   if [[ -n "${PATH_WARN-}" ]]
+   then
+     warn "${HOMEBREW_PREFIX}/bin is not in your PATH.

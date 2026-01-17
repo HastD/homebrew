@@ -6,8 +6,10 @@
 
 [Unit]
 Description=Setup Brew
-Wants=network-online.target
-After=network-online.target
+Wants=multi-user.target
+After=multi-user.target
+Wants=brew-update.service
+Before=brew-update.service
 ConditionPathExists=!/etc/.linuxbrew
 ConditionPathExists=!/home/linuxbrew/.linuxbrew
 
