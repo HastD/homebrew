@@ -55,9 +55,8 @@ mkdir -m 755 -p %{buildroot}%{_sysconfdir}/homebrew
 cp -a etc/homebrew/brew.env %{buildroot}%{_sysconfdir}/homebrew
 
 # systemd units for automatic brew setup and updates
-mkdir -m 755 -p %{buildroot}%{_unitdir} %{buildroot}%{_presetdir}
+mkdir -m 755 -p %{buildroot}%{_unitdir}
 cp -a usr/lib/systemd/system/* %{buildroot}%{_unitdir}
-cp -a usr/lib/systemd/system-preset/*.preset %{buildroot}%{_presetdir}
 
 # brew shell environment and completions
 mkdir -m 755 -p %{buildroot}%{_sysconfdir}/profile.d %{buildroot}%{_datadir}/fish/vendor_conf.d
@@ -96,7 +95,6 @@ cp -a usr/lib/tmpfiles.d/homebrew.conf %{buildroot}%{_tmpfilesdir}
 %{_unitdir}/brew-update.timer
 %{_unitdir}/brew-upgrade.service
 %{_unitdir}/brew-upgrade.timer
-%{_presetdir}/20-brew.preset
 %{_datadir}/fish/vendor_conf.d/brew-fish-completions.fish
 %{_tmpfilesdir}/homebrew.conf
 %config(noreplace) %{_sysconfdir}/homebrew

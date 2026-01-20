@@ -1,8 +1,0 @@
-# SPDX-FileCopyrightText: Copyright 2025 Universal Blue
-# SPDX-FileCopyrightText: Copyright 2025 The BlueBuild Authors
-#
-# SPDX-License-Identifier: Apache-2.0
-
-enable brew-setup.service
-enable brew-update.timer
-enable brew-upgrade.timer
