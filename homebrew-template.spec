@@ -12,15 +12,17 @@
 %global __brp_mangle_shebangs %{nil}
 %global debug_package %{nil}
 
+%define homebrew_installer_commit 1fbd624ba0419f40056a60df219617d05ee67e55
+
 Name:           homebrew
 Version:        @@VERSION@@
 Release:        1
 Summary:        The Missing Package Manager for macOS (or Linux)
 
 License:        Apache-2.0 AND BSD-2-Clause
-URL:            https://github.com/HastD/%{name}
-Source0:        %{name}-@@VERSION@@.tar.gz
-Source1:        %{name}-install.sh
+URL:            https://github.com/secureblue/homebrew
+Source0:        homebrew-@@VERSION@@.tar.gz
+Source1:        homebrew-install.sh
 
 BuildRequires:  curl >= 7.41.0
 BuildRequires:  git >= 2.7.0
@@ -37,30 +39,34 @@ Homebrew installs the stuff you need that Apple (or your Linux system) didn't.
 %prep
 %setup -C
 mv %{SOURCE1} .
-patch -p0 < %{name}-install.patch
+patch -p0 < homebrew-install.patch
 
 %build
 mkdir .linuxbrew
-env -i HOME=/home/linuxbrew PATH=/usr/bin:/bin:/usr/sbin:/sbin NONINTERACTIVE=1 /bin/bash ./%{name}-install.sh
+env -i HOME=/home/linuxbrew PATH=/usr/bin:/bin:/usr/sbin:/sbin NONINTERACTIVE=1 /bin/bash ./homebrew-install.sh
 
 %install
 # main brew installation
-mkdir -m 755 -p %{buildroot}%{_datadir}/%{name}
-cp -a .linuxbrew %{buildroot}%{_datadir}/%{name}
+mkdir -m 755 -p %{buildroot}%{_datadir}/homebrew
+cp -a .linuxbrew %{buildroot}%{_datadir}/homebrew
+
+# brew environment settings
+mkdir -m 755 -p %{buildroot}%{_sysconfdir}/homebrew
+cp -a etc/homebrew/brew.env %{buildroot}%{_sysconfdir}/homebrew
 
 # systemd units for automatic brew setup and updates
 mkdir -m 755 -p %{buildroot}%{_unitdir} %{buildroot}%{_presetdir}
-cp -a systemd/brew-*.service systemd/brew-*.timer %{buildroot}%{_unitdir}
-cp -a systemd-preset/20-brew.preset %{buildroot}%{_presetdir}
+cp -a usr/lib/systemd/system/* %{buildroot}%{_unitdir}
+cp -a usr/lib/systemd/system-preset/*.preset %{buildroot}%{_presetdir}
 
 # brew shell environment and completions
 mkdir -m 755 -p %{buildroot}%{_sysconfdir}/profile.d %{buildroot}%{_datadir}/fish/vendor_conf.d
-cp -a profile.d/brew*.sh %{buildroot}%{_sysconfdir}/profile.d
-cp -a fish/brew-fish-completions.fish %{buildroot}%{_datadir}/fish/vendor_conf.d
+cp -a etc/profile.d/brew*.sh %{buildroot}%{_sysconfdir}/profile.d
+cp -a usr/share/fish/vendor_conf.d/brew-fish-completions.fish %{buildroot}%{_datadir}/fish/vendor_conf.d
 
 # systemd-tmpfiles
 mkdir -m 755 -p %{buildroot}%{_tmpfilesdir}
-cp -a tmpfiles.d/homebrew.conf %{buildroot}%{_tmpfilesdir}
+cp -a usr/lib/tmpfiles.d/homebrew.conf %{buildroot}%{_tmpfilesdir}
 
 %post
 %systemd_post brew-setup.service
@@ -84,7 +90,7 @@ cp -a tmpfiles.d/homebrew.conf %{buildroot}%{_tmpfilesdir}
 %systemd_postun_with_restart brew-upgrade.timer
 
 %files
-%{_datadir}/%{name}
+%{_datadir}/homebrew
 %{_unitdir}/brew-setup.service
 %{_unitdir}/brew-update.service
 %{_unitdir}/brew-update.timer
@@ -93,6 +99,7 @@ cp -a tmpfiles.d/homebrew.conf %{buildroot}%{_tmpfilesdir}
 %{_presetdir}/20-brew.preset
 %{_datadir}/fish/vendor_conf.d/brew-fish-completions.fish
 %{_tmpfilesdir}/homebrew.conf
+%config(noreplace) %{_sysconfdir}/homebrew
 %config(noreplace) %{_sysconfdir}/profile.d/brew.sh
 %config(noreplace) %{_sysconfdir}/profile.d/brew-bash-completions.sh
 %ghost %config(noreplace) %{_sysconfdir}/.linuxbrew
