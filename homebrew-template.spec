@@ -25,11 +25,11 @@ Source0:        homebrew-@@VERSION@@.tar.gz
 Source1:        homebrew-install.sh
 
 BuildRequires:  curl >= 7.41.0
-BuildRequires:  git >= 2.7.0
+BuildRequires:  git-core >= 2.7.0
 BuildRequires:  systemd-rpm-macros
 Requires:       curl >= 7.41.0
 Requires:       gcc
-Requires:       git >= 2.7.0
+Requires:       git-core >= 2.7.0
 Requires:       zstd
 %{?systemd_requires}
 
@@ -107,5 +107,8 @@ cp -a usr/lib/tmpfiles.d/homebrew.conf %{buildroot}%{_tmpfilesdir}
 %ghost %config(noreplace) %{_sysconfdir}/.linuxbrew
 
 %changelog
+* Thu Jan 22 2026 Daniel Hast <hast.daniel@protonmail.com>
+  - Filter out unwanted automatic dependencies
+  - Require git-core instead of the full git package
 * Fri Jan 16 2026 Daniel Hast <hast.daniel@protonmail.com>
   - Initial RPM release
