@@ -13,10 +13,11 @@
 %global debug_package %{nil}
 
 %define homebrew_installer_commit 1fbd624ba0419f40056a60df219617d05ee67e55
+%define build_timestamp %(date -u '+%%y%%m%%d%%H')
 
 Name:           homebrew
 Version:        @@VERSION@@
-Release:        1
+Release:        %{build_timestamp}
 Summary:        The Missing Package Manager for macOS (or Linux)
 
 License:        Apache-2.0 AND BSD-2-Clause
@@ -110,5 +111,6 @@ cp -a usr/lib/tmpfiles.d/homebrew.conf %{buildroot}%{_tmpfilesdir}
 * Thu Jan 22 2026 Daniel Hast <hast.daniel@protonmail.com>
   - Filter out unwanted automatic dependencies
   - Require git-core instead of the full git package
+  - Use build timestamp for release number
 * Fri Jan 16 2026 Daniel Hast <hast.daniel@protonmail.com>
   - Initial RPM release
