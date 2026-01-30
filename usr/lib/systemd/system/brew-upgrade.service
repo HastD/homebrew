@@ -7,7 +7,7 @@
 Description=Auto-upgrade Brew packages
 After=local-fs.target
 After=network-online.target
-ConditionPathIsSymbolicLink=/home/linuxbrew/.linuxbrew/bin/brew
+ConditionFileIsExecutable=/home/linuxbrew/.linuxbrew/bin/brew
 
 [Service]
 User=1000

@@ -59,21 +59,19 @@ mkdir -m 755 -p %{buildroot}%{_datadir}/homebrew
 cp -a .linuxbrew %{buildroot}%{_datadir}/homebrew
 
 # brew environment settings
-mkdir -m 755 -p %{buildroot}%{_sysconfdir}/homebrew
-cp -a etc/homebrew/brew.env %{buildroot}%{_sysconfdir}/homebrew
+install -Dp -m 644 -t %{buildroot}%{_sysconfdir}/homebrew etc/homebrew/brew.env
 
 # systemd units for automatic brew setup and updates
-mkdir -m 755 -p %{buildroot}%{_unitdir}
-cp -a usr/lib/systemd/system/* %{buildroot}%{_unitdir}
+for unit in brew-setup.service brew-update.service brew-update.timer brew-upgrade.service brew-upgrade.timer; do
+    install -Dp -m 644 -t %{buildroot}%{_unitdir} "usr/lib/systemd/system/${unit}"
+done
 
 # brew shell environment and completions
-mkdir -m 755 -p %{buildroot}%{_sysconfdir}/profile.d %{buildroot}%{_datadir}/fish/vendor_conf.d
-cp -a etc/profile.d/brew*.sh %{buildroot}%{_sysconfdir}/profile.d
-cp -a usr/share/fish/vendor_conf.d/brew-fish-completions.fish %{buildroot}%{_datadir}/fish/vendor_conf.d
+install -Dp -m 644 -t %{buildroot}%{_sysconfdir}/profile.d etc/profile.d/brew*.sh
+install -Dp -m 644 -t %{buildroot}%{_datadir}/fish/vendor_conf.d usr/share/fish/vendor_conf.d/brew-fish-completions.fish
 
 # systemd-tmpfiles
-mkdir -m 755 -p %{buildroot}%{_tmpfilesdir}
-cp -a usr/lib/tmpfiles.d/homebrew.conf %{buildroot}%{_tmpfilesdir}
+install -Dp -m 644 -t %{buildroot}%{_tmpfilesdir} usr/lib/tmpfiles.d/homebrew.conf
 
 %post
 %systemd_post brew-setup.service

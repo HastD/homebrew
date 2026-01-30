@@ -8,7 +8,7 @@
 #shellcheck disable=all
 if status --is-interactive; and test $(/usr/bin/id -u) -ne 0
     if [ -d /home/linuxbrew/.linuxbrew ]
-        eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+        /home/linuxbrew/.linuxbrew/bin/brew shellenv fish | source
         if test -d (brew --prefix)/share/fish/completions
             set -p fish_complete_path (brew --prefix)/share/fish/completions
         end
