@@ -1,0 +1,19 @@
+# SPDX-FileCopyrightText: Copyright 2026 Daniel Hast
+#
+# SPDX-License-Identifier: Apache-2.0 OR MIT
+
+[Unit]
+Description=Set up Homebrew sandbox
+Wants=multi-user.target brew-setup.service
+After=multi-user.target brew-setup.service
+ConditionPathIsSymbolicLink=/home/linuxbrew/.linuxbrew/bin/brew
+ConditionPathExists=!/home/linuxbrew/.linuxbrew/.sandbox
+
+[Service]
+User=1000
+Type=oneshot
+ExecStart=/usr/bin/cp -a /usr/share/homebrew-sandbox/.linuxbrew/.sandbox /home/linuxbrew/.linuxbrew
+ExecStart=/usr/bin/install -p -m 755 -t /home/linuxbrew/.linuxbrew/bin /usr/share/homebrew-sandbox/.linuxbrew/bin/brew
+
+[Install]
+WantedBy=multi-user.target brew-setup.service

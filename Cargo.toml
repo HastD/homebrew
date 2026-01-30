@@ -2,5 +2,6 @@
 #
 # SPDX-License-Identifier: Apache-2.0 OR MIT
 
-d /home/linuxbrew 0755 1000 1000 - -
-d /var/tmp/homebrew 0700 1000 1000 3d -
+[workspace]
+resolver = "3"
+members = ["brew-sandbox"]
