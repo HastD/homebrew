@@ -1,0 +1,16 @@
+# SPDX-FileCopyrightText: Copyright 2026 Daniel Hast
+#
+# SPDX-License-Identifier: Apache-2.0 OR MIT
+
+[package]
+name = "brew-sandbox"
+version = "0.1.0"
+edition = "2024"
+authors = ["Daniel Hast"]
+license = "Apache-2.0 OR MIT"
+
+[dependencies]
+anyhow = "1.0.100"
+landlock = "0.4.4"
+tracing = "0.1.43"
+tracing-subscriber = "0.3.20"
