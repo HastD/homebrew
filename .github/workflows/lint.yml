@@ -21,12 +21,6 @@ jobs:
     name: REUSE spec compliance
     runs-on: ubuntu-slim
     steps:
-      - name: Install dependencies
-        shell: bash
-        run: |
-          sudo apt update
-          sudo apt install reuse
-
       - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
         with:
           persist-credentials: false
@@ -34,7 +28,7 @@ jobs:
       - name: Check REUSE compliance
         shell: bash
         run: |
-          reuse lint
+          pipx run reuse lint
 
   rpmlint:
     name: Lint RPM spec
