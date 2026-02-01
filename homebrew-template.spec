@@ -135,10 +135,9 @@ Landlock sandbox and then passes its arguments on to brew.
 
 Note that only brew itself is sandboxed, not programs intalled using brew.
 
-The sandbox allows brew full read-write access to the Homebrew prefix and cache
-directories, temporary directories, and /dev, and read-only access to /usr and
-/etc. Network access is limited to port 443 only. Brew is not granted any access
-to user home directories or /run.
+The sandbox allows brew read-write access only to the Homebrew prefix, cache,
+and temporary directories and a limited subset of /dev, and read-only access to
+/usr and /etc. Network access is limited to port 443.
 
 %post sandbox
 %systemd_post brew-sandbox-setup.service
