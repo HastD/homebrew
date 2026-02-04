@@ -36,6 +36,8 @@ The sandbox allows brew the follow access:
   `/var/tmp/homebrew`, and a limited subset of `/dev`;
 - Read-only access to `/usr`, `/etc`, `/home/linuxbrew`, and `/proc/cpuinfo`;
 - Network access to port 443 only.
+- IPC scoping is enabled, restricting communication via signals or abstract Unix
+  sockets to processes in the same or a nested Landlock domain.
 
 This sandbox can be disabled by setting `_HOMEBREW_SANDBOX=0`, either as an
 environment variable or in `/etc/homebrew/brew-sandbox.env`.
