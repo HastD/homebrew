@@ -137,7 +137,8 @@ Note that only brew itself is sandboxed, not programs intalled using brew.
 
 The sandbox allows brew read-write access only to the Homebrew prefix, cache,
 and temporary directories and a limited subset of /dev, and read-only access to
-/usr and /etc. Network access is limited to port 443.
+/usr and /etc. Network access is limited to port 443. IPC scoping is enabled,
+restricting communication via signals or abstract Unix sockets.
 
 %post sandbox
 %systemd_post brew-sandbox-setup.service

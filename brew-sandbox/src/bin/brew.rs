@@ -14,7 +14,7 @@ use std::{
 use anyhow::Result;
 use landlock::{
     ABI, Access, AccessFs, AccessNet, NetPort, Ruleset, RulesetAttr, RulesetCreatedAttr,
-    RulesetStatus, path_beneath_rules,
+    RulesetStatus, Scope, path_beneath_rules,
 };
 use tracing::{debug, level_filters::LevelFilter, warn};
 
@@ -55,6 +55,7 @@ fn restrict_self() -> Result<()> {
     let status = Ruleset::default()
         .handle_access(access_all)?
         .handle_access(AccessNet::from_all(abi))?
+        .scope(Scope::from_all(abi))?
         .create()?
         .add_rules(path_beneath_rules(
             &["/etc", "/home/linuxbrew", "/proc/cpuinfo", "/usr"],
