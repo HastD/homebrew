@@ -86,6 +86,9 @@ fn restrict_self() -> Result<()> {
         }
         RulesetStatus::NotEnforced => warn!("Landlock sandboxing not enforced."),
     }
+    if !status.no_new_privs {
+        warn!("Failed to restrict privileges (PR_SET_NO_NEW_PRIVS not set).")
+    }
     Ok(())
 }
 
