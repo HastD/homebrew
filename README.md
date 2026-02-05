@@ -32,12 +32,19 @@ Note that only brew itself is sandboxed, not programs intalled using brew.
 
 The sandbox allows brew the follow access:
 
-- Read-write access to `/home/linuxbrew/.linuxbrew`, `/home/linuxbrew/.cache`,
-  `/var/tmp/homebrew`, and a limited subset of `/dev`;
-- Read-only access to `/usr`, `/etc`, `/home/linuxbrew`, and `/proc/cpuinfo`;
+- Read-write access to `/home/linuxbrew`, `/var/tmp/homebrew`, and a limited
+  subset of `/dev`;
+- Read-only access to `/usr`, `/etc`, and `/proc/cpuinfo`;
 - Network access to port 443 only.
 - IPC scoping is enabled, restricting communication via signals or abstract Unix
   sockets to processes in the same or a nested Landlock domain.
+
+> [!WARNING]
+> The current version of Landlock does not support scoping of pathname sockets.
+> This means sandbox escapes are possible, and as such, this sandbox should only
+> be considered a best-effort mitigation against opportunistic attacks, not a
+> comprehensive security measure. This is expected to be fixed in a future
+> Landlock version.
 
 This sandbox can be disabled by setting `_HOMEBREW_SANDBOX=0`, either as an
 environment variable or in `/etc/homebrew/brew-sandbox.env`.

@@ -3,15 +3,15 @@
 // SPDX-License-Identifier: Apache-2.0 OR MIT
 
 use std::{
+    env,
     fs::{File, create_dir_all},
-    io::{BufRead, BufReader, ErrorKind},
+    io::{self, BufRead, BufReader, ErrorKind},
     os::unix::{fs::symlink, process::CommandExt},
     path::PathBuf,
     process::Command,
-    sync::LazyLock,
 };
 
-use anyhow::Result;
+use anyhow::{Result, bail};
 use landlock::{
     ABI, Access, AccessFs, AccessNet, NetPort, Ruleset, RulesetAttr, RulesetCreatedAttr,
     RulesetStatus, Scope, path_beneath_rules,
@@ -23,31 +23,30 @@ const PORT_HTTPS: u16 = 443;
 const SANDBOX_ENV_VAR: &str = "_HOMEBREW_SANDBOX";
 const DEBUG_ENV_VAR: &str = "_HOMEBREW_SANDBOX_DEBUG";
 
-static HOMEBREW_PREFIX: LazyLock<PathBuf> = LazyLock::new(|| {
-    std::env::var_os("HOMEBREW_PREFIX")
-        .unwrap_or_else(|| "/home/linuxbrew/.linuxbrew".into())
-        .into()
-});
+const BREW_SYMLINK_PATH: &str = "/home/linuxbrew/.linuxbrew/.sandbox/brew-unsandboxed";
+const BREW_TARGET_PATH: &str = "../Homebrew/bin/brew";
 
-static HOMEBREW_CACHE: LazyLock<PathBuf> = LazyLock::new(|| {
-    std::env::var_os("HOMEBREW_CACHE")
-        .unwrap_or_else(|| "/home/linuxbrew/.cache/Homebrew".into())
-        .into()
-});
-
-fn brew_path() -> PathBuf {
-    HOMEBREW_PREFIX.join(".sandbox/brew-unsandboxed")
-}
-
+/// Create symlink to brew executable to replace the one that's overridden by
+/// the sandbox executable. Fails if the symlink target doesn't exist.
 fn make_brew_symlink() -> Result<()> {
-    create_dir_all(HOMEBREW_PREFIX.join(".sandbox"))?;
-    match symlink("../Homebrew/bin/brew", brew_path()) {
+    let brew_symlink_dir = PathBuf::from(BREW_SYMLINK_PATH.rsplit_once("/").unwrap().0);
+    let brew_target_abspath = brew_symlink_dir.join(BREW_TARGET_PATH).canonicalize()?;
+    if !brew_target_abspath.is_file() {
+        bail!(
+            "Brew executable not found at {}",
+            brew_target_abspath.display()
+        );
+    }
+    create_dir_all(brew_symlink_dir)?;
+    match symlink(BREW_TARGET_PATH, BREW_SYMLINK_PATH) {
         Ok(()) => Ok(()),
         Err(err) if matches!(err.kind(), ErrorKind::AlreadyExists) => Ok(()),
         Err(err) => Err(err.into()),
     }
 }
 
+/// Apply Landlock sandbox to current thread, restricting filesystem, network,
+/// and IPC access.
 fn restrict_self() -> Result<()> {
     let abi = ABI::V6;
     let access_all = AccessFs::from_all(abi);
@@ -58,7 +57,7 @@ fn restrict_self() -> Result<()> {
         .scope(Scope::from_all(abi))?
         .create()?
         .add_rules(path_beneath_rules(
-            &["/etc", "/home/linuxbrew", "/proc/cpuinfo", "/usr"],
+            &["/etc", "/proc/cpuinfo", "/usr"],
             access_read,
         ))?
         .add_rules(path_beneath_rules(
@@ -69,12 +68,9 @@ fn restrict_self() -> Result<()> {
                 "/dev/random",
                 "/dev/urandom",
                 "/dev/zero",
+                "/home/linuxbrew",
                 "/var/tmp/homebrew",
             ],
-            access_all,
-        ))?
-        .add_rules(path_beneath_rules(
-            &[&**HOMEBREW_CACHE, &**HOMEBREW_PREFIX],
             access_all,
         ))?
         .add_rule(NetPort::new(PORT_HTTPS, AccessNet::ConnectTcp))?
@@ -92,11 +88,12 @@ fn restrict_self() -> Result<()> {
     Ok(())
 }
 
+/// Read environment and config files to determine whether sandboxing should be applied.
 fn should_sandbox() -> Result<bool> {
     let env_var_test =
         |value: &str| !value.is_empty() && value != "0" && value.to_lowercase() != "false";
 
-    if let Ok(sandbox_var) = std::env::var(SANDBOX_ENV_VAR) {
+    if let Ok(sandbox_var) = env::var(SANDBOX_ENV_VAR) {
         return Ok(env_var_test(&sandbox_var));
     }
 
@@ -114,8 +111,9 @@ fn should_sandbox() -> Result<bool> {
     Ok(true)
 }
 
+/// Initialize tracing subscriber that prints to stderr at the selected log level.
 fn init_logging() {
-    let filter = if std::env::var_os(DEBUG_ENV_VAR).is_some() {
+    let filter = if env::var_os(DEBUG_ENV_VAR).is_some() {
         LevelFilter::DEBUG
     } else {
         LevelFilter::WARN
@@ -124,15 +122,15 @@ fn init_logging() {
         .compact()
         .with_max_level(filter)
         .without_time()
-        .with_writer(std::io::stderr)
+        .with_writer(io::stderr)
         .init();
 }
 
 fn main() -> Result<()> {
     // SAFETY: The program is single-threaded.
     unsafe {
-        std::env::set_var("HOME", "/home/linuxbrew");
-        std::env::set_var("XDG_CACHE_HOME", "/home/linuxbrew/.cache");
+        env::set_var("HOME", "/home/linuxbrew");
+        env::set_var("XDG_CACHE_HOME", "/home/linuxbrew/.cache");
     }
     init_logging();
     if should_sandbox()? {
@@ -141,8 +139,8 @@ fn main() -> Result<()> {
         debug!("Not applying Landlock sandboxing due to {SANDBOX_ENV_VAR} setting.")
     }
     make_brew_symlink()?;
-    let mut args = std::env::args_os();
-    let error = Command::new(brew_path())
+    let mut args = env::args_os();
+    let error = Command::new(BREW_SYMLINK_PATH)
         .arg0(args.next().unwrap())
         .args(args)
         .exec();
