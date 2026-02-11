@@ -61,10 +61,8 @@ cp -a .linuxbrew %{buildroot}%{_datadir}/homebrew
 # brew environment settings
 install -Dp -m 644 -t %{buildroot}%{_sysconfdir}/homebrew etc/homebrew/brew.env
 
-# systemd units for automatic brew setup and updates
-for unit in brew-setup.service brew-update.service brew-update.timer brew-upgrade.service brew-upgrade.timer; do
-    install -Dp -m 644 -t %{buildroot}%{_unitdir} "usr/lib/systemd/system/${unit}"
-done
+# systemd units for automatic brew updates
+install -Dp -m 644 -t %{buildroot}%{_unitdir} usr/lib/systemd/system/*
 
 # brew shell environment and completions
 install -Dp -m 644 -t %{buildroot}%{_sysconfdir}/profile.d etc/profile.d/brew*.sh
@@ -74,21 +72,18 @@ install -Dp -m 644 -t %{buildroot}%{_datadir}/fish/vendor_conf.d usr/share/fish/
 install -Dp -m 644 -t %{buildroot}%{_tmpfilesdir} usr/lib/tmpfiles.d/homebrew.conf
 
 %post
-%systemd_post brew-setup.service
 %systemd_post brew-update.service
 %systemd_post brew-update.timer
 %systemd_post brew-upgrade.service
 %systemd_post brew-upgrade.timer
 
 %preun
-%systemd_preun brew-setup.service
 %systemd_preun brew-update.service
 %systemd_preun brew-update.timer
 %systemd_preun brew-upgrade.service
 %systemd_preun brew-upgrade.timer
 
 %postun
-%systemd_postun_with_reload brew-setup.service
 %systemd_postun_with_reload brew-update.service
 %systemd_postun_with_restart brew-update.timer
 %systemd_postun_with_reload brew-upgrade.service
@@ -96,7 +91,6 @@ install -Dp -m 644 -t %{buildroot}%{_tmpfilesdir} usr/lib/tmpfiles.d/homebrew.co
 
 %files
 %{_datadir}/homebrew
-%{_unitdir}/brew-setup.service
 %{_unitdir}/brew-update.service
 %{_unitdir}/brew-update.timer
 %{_unitdir}/brew-upgrade.service
@@ -106,9 +100,10 @@ install -Dp -m 644 -t %{buildroot}%{_tmpfilesdir} usr/lib/tmpfiles.d/homebrew.co
 %config(noreplace) %{_sysconfdir}/homebrew
 %config(noreplace) %{_sysconfdir}/profile.d/brew.sh
 %config(noreplace) %{_sysconfdir}/profile.d/brew-bash-completions.sh
-%ghost %config(noreplace) %{_sysconfdir}/.linuxbrew
 
 %changelog
+* Wed Feb 11 2026 Daniel Hast <hast.daniel@protonmail.com>
+  - Use tmpfiles.d in place of brew-setup.service
 * Wed Jan 28 2026 Daniel Hast <hast.daniel@protonmail.com>
   - Update installer commit
   - Make Homebrew/brew repo part of SRPM
