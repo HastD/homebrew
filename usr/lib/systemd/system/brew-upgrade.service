@@ -1,5 +1,6 @@
 # SPDX-FileCopyrightText: Copyright 2025 Universal Blue
 # SPDX-FileCopyrightText: Copyright 2025 The BlueBuild Authors
+# SPDX-FileCopyrightText: Copyright 2026 Daniel Hast
 #
 # SPDX-License-Identifier: Apache-2.0
 
@@ -7,7 +8,7 @@
 Description=Auto-upgrade Brew packages
 After=local-fs.target
 After=network-online.target
-ConditionFileIsExecutable=/home/linuxbrew/.linuxbrew/bin/brew
+ConditionPathExists=/home/linuxbrew/.linuxbrew/bin/brew
 
 [Service]
 User=1000
@@ -15,9 +16,9 @@ Type=oneshot
 Environment=HOMEBREW_CELLAR=/home/linuxbrew/.linuxbrew/Cellar
 Environment=HOMEBREW_PREFIX=/home/linuxbrew/.linuxbrew
 Environment=HOMEBREW_REPOSITORY=/home/linuxbrew/.linuxbrew/Homebrew
-ExecStart=/usr/bin/bash -c "/home/linuxbrew/.linuxbrew/bin/brew upgrade"
-ExecStartPost=-/usr/bin/bash -c "/home/linuxbrew/.linuxbrew/bin/brew unlink systemd"
-ExecStartPost=-/usr/bin/bash -c "/home/linuxbrew/.linuxbrew/bin/brew unlink dbus"
-ExecStartPost=-/usr/bin/bash -c "/home/linuxbrew/.linuxbrew/bin/brew unlink gsettings"
-ExecStartPost=-/usr/bin/bash -c "/home/linuxbrew/.linuxbrew/bin/brew unlink bash"
-ExecStartPost=-/usr/bin/bash -c "/home/linuxbrew/.linuxbrew/bin/brew unlink rpm"
+ExecStart=/bin/sh -c "/home/linuxbrew/.linuxbrew/bin/brew upgrade"
+ExecStartPost=-/bin/sh -c "/home/linuxbrew/.linuxbrew/bin/brew unlink systemd"
+ExecStartPost=-/bin/sh -c "/home/linuxbrew/.linuxbrew/bin/brew unlink dbus"
+ExecStartPost=-/bin/sh -c "/home/linuxbrew/.linuxbrew/bin/brew unlink gsettings"
+ExecStartPost=-/bin/sh -c "/home/linuxbrew/.linuxbrew/bin/brew unlink bash"
+ExecStartPost=-/bin/sh -c "/home/linuxbrew/.linuxbrew/bin/brew unlink rpm"
