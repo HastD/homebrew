@@ -16,7 +16,6 @@ Type=oneshot
 ExecStart=/usr/bin/cp -R --update=none /usr/share/homebrew/.linuxbrew /home/linuxbrew
 ExecStart=/usr/bin/chown -R 1000:1000 /home/linuxbrew
 ExecStartPost=/usr/bin/touch /etc/.linuxbrew
-ExecStartPost=/usr/bin/systemctl start brew-update.service
 
 [Install]
 WantedBy=default.target multi-user.target

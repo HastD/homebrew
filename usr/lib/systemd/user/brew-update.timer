@@ -6,10 +6,11 @@
 
 [Unit]
 Description=Timer for updating Brew binary
-Wants=network-online.target
+Wants=timers.target
+ConditionUser=1000
 
 [Timer]
-OnBootSec=10min
+OnStartupSec=10min
 OnUnitInactiveSec=6h
 Persistent=true
 

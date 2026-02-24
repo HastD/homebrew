@@ -6,12 +6,11 @@
 
 [Unit]
 Description=Auto-upgrade Brew packages
-After=local-fs.target
-After=network-online.target
-ConditionPathExists=/home/linuxbrew/.linuxbrew/bin/brew
+After=default.target
+ConditionUser=1000
+ConditionFileIsExecutable=/home/linuxbrew/.linuxbrew/bin/brew
 
 [Service]
-User=1000
 Type=oneshot
 Environment=HOMEBREW_CELLAR=/home/linuxbrew/.linuxbrew/Cellar
 Environment=HOMEBREW_PREFIX=/home/linuxbrew/.linuxbrew
