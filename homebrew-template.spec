@@ -34,6 +34,7 @@ Requires:       gcc
 Requires:       git-core >= 2.7.0
 Requires:       zstd
 %{?systemd_requires}
+Recommends:     brew-proxy
 
 # Filter out unwanted automatic dependencies. For documentation, see:
 # https://docs.fedoraproject.org/en-US/packaging-guidelines/AutoProvidesAndRequiresFiltering/
@@ -52,6 +53,7 @@ patch -p0 < homebrew-install.patch
 mkdir .linuxbrew
 env -i HOME=/home/linuxbrew PATH=/usr/bin:/bin:/usr/sbin:/sbin NONINTERACTIVE=1 \
     HOMEBREW_BREW_LOCAL_GIT_REMOTE="${PWD}/brew.git" /bin/bash ./homebrew-install.sh
+chmod -R u=rwX,go=rX .linuxbrew
 
 %install
 # main brew installation
@@ -62,46 +64,53 @@ cp -a .linuxbrew %{buildroot}%{_datadir}/homebrew
 install -Dp -m 644 -t %{buildroot}%{_sysconfdir}/homebrew etc/homebrew/brew.env
 
 # systemd units for automatic brew updates
-install -Dp -m 644 -t %{buildroot}%{_userunitdir} usr/lib/systemd/user/*
+install -Dp -m 644 -t %{buildroot}%{_unitdir} usr/lib/systemd/system/*
 
 # brew shell environment and completions
 install -Dp -m 644 -t %{buildroot}%{_sysconfdir}/profile.d etc/profile.d/brew*.sh
 install -Dp -m 644 -t %{buildroot}%{_datadir}/fish/vendor_conf.d usr/share/fish/vendor_conf.d/brew-fish-completions.fish
 
+# systemd-sysusers
+install -Dp -m 644 -t %{buildroot}%{_sysusersdir} usr/lib/sysusers.d/homebrew.conf
+
 # systemd-tmpfiles
 install -Dp -m 644 -t %{buildroot}%{_tmpfilesdir} usr/lib/tmpfiles.d/homebrew.conf
 
 %post
-%systemd_user_post brew-update.service
-%systemd_user_post brew-update.timer
-%systemd_user_post brew-upgrade.service
-%systemd_user_post brew-upgrade.timer
+%systemd_post brew-update.service
+%systemd_post brew-update.timer
+%systemd_post brew-upgrade.service
+%systemd_post brew-upgrade.timer
 
 %preun
-%systemd_user_preun brew-update.service
-%systemd_user_preun brew-update.timer
-%systemd_user_preun brew-upgrade.service
-%systemd_user_preun brew-upgrade.timer
+%systemd_preun brew-update.service
+%systemd_preun brew-update.timer
+%systemd_preun brew-upgrade.service
+%systemd_preun brew-upgrade.timer
 
 %postun
-%systemd_user_postun_with_reload brew-update.service
-%systemd_user_postun_with_restart brew-update.timer
-%systemd_user_postun_with_reload brew-upgrade.service
-%systemd_user_postun_with_restart brew-upgrade.timer
+%systemd_postun_with_reload brew-update.service
+%systemd_postun_with_restart brew-update.timer
+%systemd_postun_with_reload brew-upgrade.service
+%systemd_postun_with_restart brew-upgrade.timer
 
 %files
+%doc README.md
 %{_datadir}/homebrew
-%{_userunitdir}/brew-update.service
-%{_userunitdir}/brew-update.timer
-%{_userunitdir}/brew-upgrade.service
-%{_userunitdir}/brew-upgrade.timer
+%{_unitdir}/brew-update.service
+%{_unitdir}/brew-update.timer
+%{_unitdir}/brew-upgrade.service
+%{_unitdir}/brew-upgrade.timer
 %{_datadir}/fish/vendor_conf.d/brew-fish-completions.fish
+%{_sysusersdir}/homebrew.conf
 %{_tmpfilesdir}/homebrew.conf
 %config(noreplace) %{_sysconfdir}/homebrew
 %config(noreplace) %{_sysconfdir}/profile.d/brew.sh
 %config(noreplace) %{_sysconfdir}/profile.d/brew-bash-completions.sh
 
 %changelog
+* Mon Apr 06 2026 Daniel Hast <hast.daniel@protonmail.com>
+  - Switch to linuxbrew-owned installation
 * Fri Feb 27 2026 Daniel Hast <hast.daniel@protonmail.com>
   - Use tmpfiles.d in place of brew-setup.service
 * Mon Feb 23 2026 Daniel Hast <hast.daniel@protonmail.com>

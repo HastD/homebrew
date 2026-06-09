@@ -7,7 +7,6 @@
 [Unit]
 Description=Timer for upgrading Brew packages
 Wants=timers.target
-ConditionUser=1000
 
 [Timer]
 OnStartupSec=30min

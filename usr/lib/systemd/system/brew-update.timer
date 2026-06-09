@@ -7,7 +7,6 @@
 [Unit]
 Description=Timer for updating Brew binary
 Wants=timers.target
-ConditionUser=1000
 
 [Timer]
 OnStartupSec=10min

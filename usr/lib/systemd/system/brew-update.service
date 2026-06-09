@@ -6,11 +6,16 @@
 
 [Unit]
 Description=Auto-update Brew binary
-After=default.target
-ConditionUser=1000
-ConditionFileIsExecutable=/home/linuxbrew/.linuxbrew/bin/brew
+After=multi-user.target
+ConditionFileIsExecutable=|/home/linuxbrew/.linuxbrew/bin/brew
+# If the path is a symbolic link, the above check has to follow the link, which
+# fails on some systems due to SELinux not allowing the system service manager
+# to read file contents in home directories. So we add a second triggering
+# condition making the unit start if the path is a symbolic link.
+ConditionPathIsSymbolicLink=|/home/linuxbrew/.linuxbrew/bin/brew
 
 [Service]
+User=linuxbrew
 Type=oneshot
 Environment=HOMEBREW_CELLAR=/home/linuxbrew/.linuxbrew/Cellar
 Environment=HOMEBREW_PREFIX=/home/linuxbrew/.linuxbrew

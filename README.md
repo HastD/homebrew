@@ -18,9 +18,14 @@ after installation (such as setting up the Homebrew cache and running
 
 If Homebrew has not already been set up on the user's system, a systemd-tmpfiles
 configuration copies this installation to `/home/linuxbrew` and transfers
-ownership of it to UID 1000. The package also sets up systemd services to
-automatically update Homebrew, as well as shell completions for the bash and
-fish shells.
+ownership of it to the `linuxbrew` user. The package also sets up systemd
+services to automatically update Homebrew, as well as shell completions for the
+bash and fish shells.
+
+To make it more convenient for authorized users to manage the Homebrew
+installation, the `brew-proxy` package can be installed. This includes a
+DBus-activated service that allows authorized users to execute `brew` commands
+as the `linuxbrew` user via the `brew-proxy` command.
 
 ## Credit
 

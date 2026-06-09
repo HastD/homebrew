@@ -74,7 +74,7 @@ jobs:
         with:
           persist-credentials: false
 
-      - name: Check REUSE compliance
+      - name: Run ShellCheck
         shell: bash
         run: |
           find . -type f -name '*.sh' -execdir shellcheck '{}' +
