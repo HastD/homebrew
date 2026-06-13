@@ -109,18 +109,4 @@ install -Dp -m 644 -t %{buildroot}%{_tmpfilesdir} usr/lib/tmpfiles.d/homebrew.co
 %config(noreplace) %{_sysconfdir}/profile.d/brew-bash-completions.sh
 
 %changelog
-* Mon Apr 06 2026 Daniel Hast <hast.daniel@protonmail.com>
-  - Switch to linuxbrew-owned installation
-* Fri Feb 27 2026 Daniel Hast <hast.daniel@protonmail.com>
-  - Use tmpfiles.d in place of brew-setup.service
-* Mon Feb 23 2026 Daniel Hast <hast.daniel@protonmail.com>
-  - Make update services/timers into user units
-* Wed Jan 28 2026 Daniel Hast <hast.daniel@protonmail.com>
-  - Update installer commit
-  - Make Homebrew/brew repo part of SRPM
-* Thu Jan 22 2026 Daniel Hast <hast.daniel@protonmail.com>
-  - Filter out unwanted automatic dependencies
-  - Require git-core instead of the full git package
-  - Use build timestamp for release number
-* Fri Jan 16 2026 Daniel Hast <hast.daniel@protonmail.com>
-  - Initial RPM release
+# Changelog entries automatically generated from upstream releases
